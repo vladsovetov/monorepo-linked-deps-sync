@@ -5,6 +5,10 @@ inputs:
     description: 'Glob path to packages.json'
     required: false
     default: 'packages/**/package.json'
+  sync-commit-message:
+    description: 'Commit message after versions sync'
+    required: false
+    default: 'chore: synced versions for linked packages'
 runs:
   using: 'node16'
   main: 'dist/index.js'

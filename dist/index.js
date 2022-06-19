@@ -5499,7 +5499,8 @@ const { exec } = __nccwpck_require__(81)
 
 try {
   const startTime = Date.now()
-  const packagesPath = 'packages/**/package.json'
+  const packagesPath = core.getInput('packages-path')
+  const syncCommitMessage = core.getInput('sync-commit-message')
   glob(
     packagesPath,
     {
@@ -5525,7 +5526,7 @@ try {
       )
       if (inconsistentPackages.length) {
         fixInconsistencies(inconsistentPackages)
-        exec('git commit -am', (err, stdout, stderr) => {
+        exec(`git commit -am "${syncCommitMessage}"`, (err, stdout, stderr) => {
           if (err) {
             core.setFailed(err.message)
           }
