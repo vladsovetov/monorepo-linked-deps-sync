@@ -7,4 +7,4 @@ inputs:
     default: 'packages/**/package.json'
 runs:
   using: 'node16'
-  main: 'index.js'
+  main: 'dist/index.js'
