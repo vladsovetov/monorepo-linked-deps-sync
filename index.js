@@ -59,6 +59,7 @@ try {
           git config user.email "${syncCommitEmail}" &&
           git config user.name "${syncCommitName}" &&
           git commit -am "${syncCommitMessage}"
+          git push
           `,
           (err, stdout, stderr) => {
             if (err) {
