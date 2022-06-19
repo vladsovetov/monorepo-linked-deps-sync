@@ -27,6 +27,8 @@ try {
   const startTime = Date.now()
   const packagesPath = core.getInput('packages-path')
   const syncCommitMessage = core.getInput('sync-commit-message')
+  const syncCommitEmail = core.getInput('sync-commit-email')
+  const syncCommitName = core.getInput('sync-commit-name')
   glob(
     packagesPath,
     {
@@ -52,13 +54,20 @@ try {
       )
       if (inconsistentPackages.length) {
         fixInconsistencies(inconsistentPackages)
-        exec(`git commit -am "${syncCommitMessage}"`, (err, stdout, stderr) => {
-          if (err) {
-            core.setFailed(err.message)
+        exec(
+          `
+          git config user.email "${syncCommitEmail}" &&
+          git config user.name "${syncCommitName}" &&
+          git commit -am "${syncCommitMessage}"
+          `,
+          (err, stdout, stderr) => {
+            if (err) {
+              core.setFailed(err.message)
+            }
+            console.log(`stdout: ${stdout}`)
+            console.log(`stderr: ${stderr}`)
           }
-          console.log(`stdout: ${stdout}`)
-          console.log(`stderr: ${stderr}`)
-        })
+        )
       } else {
         console.log(`No inconsistencies`)
       }

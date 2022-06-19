@@ -9,6 +9,14 @@ inputs:
     description: 'Commit message after versions sync'
     required: false
     default: 'chore: synced versions for linked packages'
+  sync-commit-email:
+    description: "Commit message author's email"
+    required: false
+    default: 'bot@monorepo-linked-deps-sync.io'
+  sync-commit-name:
+    description: "Commit message author's name"
+    required: false
+    default: 'Bot Monorepo Linked Deps Sync'
 runs:
   using: 'node16'
   main: 'dist/index.js'
