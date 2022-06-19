@@ -25,7 +25,7 @@ const fs = require('fs')
 try {
   const startTime = Date.now()
   const packagesPath = core.getInput('packages-path')
-  glob([packagesPath, '!node_modules'], options, function (er, files) {
+  glob([packagesPath, '!node_modules'], {}, function (er, files) {
     if (er) {
       core.setFailed(
         `Can not find files using provided glob ${packagesPath}: ${er.message}`
