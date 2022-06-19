@@ -5491,7 +5491,7 @@ const fs = __nccwpck_require__(147)
 try {
   const startTime = Date.now()
   const packagesPath = core.getInput('packages-path')
-  glob([packagesPath, '!node_modules'], options, function (er, files) {
+  glob([packagesPath, '!node_modules'], {}, function (er, files) {
     if (er) {
       core.setFailed(
         `Can not find files using provided glob ${packagesPath}: ${er.message}`
