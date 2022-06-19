@@ -1,0 +1,29 @@
+{
+  "name": "monorepo-linked-deps-sync",
+  "version": "1.0.0",
+  "description": "Linking internal dependencies inside monorepo npm project",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vladsovetov/monorepo-linked-deps-sync.git"
+  },
+  "keywords": [
+    "monorepo",
+    "sync",
+    "dependencies"
+  ],
+  "author": "Vlad Sovetov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vladsovetov/monorepo-linked-deps-sync/issues"
+  },
+  "homepage": "https://github.com/vladsovetov/monorepo-linked-deps-sync#readme",
+  "dependencies": {
+    "@actions/core": "^1.9.0",
+    "@actions/github": "^5.0.3",
+    "glob": "^8.0.3"
+  },
+  "devDependencies": {
+    "prettier": "^2.7.1"
+  }
+}

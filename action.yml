@@ -1,0 +1,10 @@
+name: 'Sync internal dependencies'
+description: 'Linking internal dependencies inside monorepo npm project'
+inputs:
+  packages-path:
+    description: 'Glob path to packages.json'
+    required: true
+    default: 'packages/**/package.json'
+runs:
+  using: 'node16'
+  main: 'index.js'
