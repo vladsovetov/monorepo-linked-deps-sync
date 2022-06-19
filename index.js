@@ -1,6 +1,7 @@
 const core = require('@actions/core')
 const glob = require('glob')
 const fs = require('fs')
+const { exec } = require('child_process')
 
 /**
  * @typedef PackageDependency
@@ -14,7 +15,7 @@ const fs = require('fs')
 
 /**
  * @typedef PackageJsonInfo
- * @type {{path: string, json: PackageJson}}
+ * @type {{path: string, json: PackageJson, text: string}}
  */
 
 /**
@@ -24,17 +25,44 @@ const fs = require('fs')
 
 try {
   const startTime = Date.now()
-  const packagesPath = core.getInput('packages-path')
-  glob([packagesPath, '!node_modules'], {}, function (er, files) {
-    if (er) {
-      core.setFailed(
-        `Can not find files using provided glob ${packagesPath}: ${er.message}`
+  const packagesPath = 'packages/**/package.json'
+  glob(
+    packagesPath,
+    {
+      ignore: '**/node_modules/**'
+    },
+    function (er, files) {
+      console.log(
+        `Found package.json files: ${JSON.stringify(files, null, '  ')}`
       )
+      if (er) {
+        core.setFailed(
+          `Can not find files using provided glob ${packagesPath}: ${er.message}`
+        )
+      }
+      const packages = getPackageInfos(files)
+      const inconsistentPackages = findInconsistencies(packages)
+      console.log(
+        `Found inconsistencies: ${JSON.stringify(
+          inconsistentPackages.map(({ path, reasons }) => ({ path, reasons })),
+          null,
+          '  '
+        )}`
+      )
+      if (inconsistentPackages.length) {
+        fixInconsistencies(inconsistentPackages)
+        exec('git commit -am', (err, stdout, stderr) => {
+          if (err) {
+            core.setFailed(err.message)
+          }
+          console.log(`stdout: ${stdout}`)
+          console.log(`stderr: ${stderr}`)
+        })
+      } else {
+        console.log(`No inconsistencies`)
+      }
     }
-    const packages = getPackageInfos(files)
-    const inconsistentPackages = findInconsistencies(packages)
-    fixInconsistencies(inconsistentPackages)
-  })
+  )
   console.log(`Finished in ${Date.now() - startTime}ms`)
 } catch (error) {
   core.setFailed(error.message)
@@ -55,14 +83,13 @@ function getPackageInfos(packagePaths) {
      */
     let packageJson
     try {
-      packageJson = JSON.stringify(
-        fs.readFileSync(packagePath, { encoding: 'utf-8' })
-      )
+      packageJson = fs.readFileSync(packagePath, { encoding: 'utf-8' })
     } catch (error) {
       core.setFailed(`Can not read/parse ${packagePath}: ${error.message}`)
     }
     packages.push({
-      json: packageJson,
+      json: JSON.parse(packageJson),
+      text: packageJson,
       path: packagePath
     })
   }
@@ -79,28 +106,32 @@ function findInconsistencies(packages) {
    * @type {InconsistentPackageJson[]}
    */
   const inconsistentPackages = []
-  for (let i = 0; i < packages.length; i++) {
-    const masterPackage = packages[i]
-    for (let j = i + 1; j < packages.length; j++) {
-      const linkedPackage = packages[j]
+  for (const masterPackage of packages) {
+    for (const linkedPackage of packages) {
+      if (masterPackage.path === linkedPackage.path) continue
+
       for (const depType of ['dependencies', 'devDependencies']) {
+        if (!linkedPackage.json[depType]) continue
+
         const foundVersionInconsistency = Object.entries(
-          linkedPackage[depType]
-        ).find(
-          ({ name, version }) =>
-            name === masterPackage.name && version !== masterPackage.version
-        )
+          linkedPackage.json[depType]
+        ).find(([name, version]) => {
+          return (
+            name === masterPackage.json.name &&
+            version !== masterPackage.json.version
+          )
+        })
         if (foundVersionInconsistency) {
           console.log(
-            `Found inconsistency in ${linkedPackage.path}: ${masterPackage.name} ${masterPackage.version} -> ${foundVersionInconsistency[1]}`
+            `Found inconsistency in ${linkedPackage.path}: ${masterPackage.json.name} ${foundVersionInconsistency[1]} -> ${masterPackage.json.version}`
           )
           inconsistentPackages.push({
             ...linkedPackage,
             reasons: [
               {
-                name: masterPackage.name,
-                newVersion: masterPackage.version,
-                oldVersion: foundVersionInconsistency[1]
+                name: masterPackage.json.name,
+                oldVersion: foundVersionInconsistency[1],
+                newVersion: masterPackage.json.version
               }
             ]
           })
@@ -118,21 +149,30 @@ function findInconsistencies(packages) {
  */
 function fixInconsistencies(inconsistentPackages) {
   for (const inconsistentPackage of inconsistentPackages) {
-    let content = inconsistentPackage.json
+    let content = inconsistentPackage.text
     for (const reason of inconsistentPackage.reasons) {
       content = content.replace(
         new RegExp(
-          `("${inconsistentPackage.name}"\\s*:\\s*)"${reason.oldVersion}"`
+          `("${reason.name}"\\s*:\\s*)"${maskVersionRegExp(reason.oldVersion)}"`
         ),
-        `"$1"${reason.newVersion}"`
+        `$1"${maskVersionRegExp(reason.newVersion)}"`
       )
     }
     try {
-      fs.writeSync(inconsistentPackage.path, content, 'utf8')
+      fs.writeFileSync(inconsistentPackage.path, content, 'utf8')
     } catch (error) {
       core.setFailed(
         `Can not write synced versions into ${inconsistentPackage.path}: ${error.message}`
       )
     }
   }
+}
+
+/**
+ *
+ * @param {string} version
+ * @returns {string}
+ */
+function maskVersionRegExp(version) {
+  return version.replace('^', '\\^')
 }

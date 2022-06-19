@@ -1,8 +1,12 @@
 {
   "name": "monorepo-linked-deps-sync",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "Linking internal dependencies inside monorepo npm project",
   "main": "index.js",
+  "scripts": {
+    "build": "ncc build index.js --license licenses.txt",
+    "tag": "git tag -a -m 'Action release ${0}' && git push --follow-tags"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vladsovetov/monorepo-linked-deps-sync.git"
