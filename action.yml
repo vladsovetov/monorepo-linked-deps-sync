@@ -17,6 +17,10 @@ inputs:
     description: "Commit message author's name"
     required: false
     default: 'github-actions[bot]'
+  commit-arguments:
+    description: "Adds additional arguments for git commit command. E.g. --no-verify to disable tests"
+    required: false
+    default: ''
 runs:
   using: 'node16'
   main: 'dist/index.js'

@@ -1,6 +1,6 @@
 {
   "name": "monorepo-linked-deps-sync",
-  "version": "2.4",
+  "version": "2.5",
   "description": "Linking internal dependencies inside monorepo npm project",
   "main": "index.js",
   "scripts": {

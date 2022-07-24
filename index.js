@@ -29,6 +29,7 @@ try {
   const syncCommitMessage = core.getInput('sync-commit-message')
   const syncCommitEmail = core.getInput('sync-commit-email')
   const syncCommitName = core.getInput('sync-commit-name')
+  const commitArguments = core.getInput('commit-arguments')
   glob(
     packagesPath,
     {
@@ -58,7 +59,7 @@ try {
           `
           git config user.email "${syncCommitEmail}" &&
           git config user.name "${syncCommitName}" &&
-          git commit -am "${syncCommitMessage}" &&
+          git commit -am "${syncCommitMessage}" ${commitArguments} &&
           git push
           `,
           (err, stdout, stderr) => {
