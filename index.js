@@ -122,7 +122,7 @@ function findInconsistencies(packages) {
       if (masterPackage.path === linkedPackage.path) continue
 
       for (const depType of ['dependencies', 'devDependencies']) {
-        if (linkedPackage.json[depType]) continue
+        if (!linkedPackage.json[depType]) continue
 
         const foundVersionInconsistency = Object.entries(
           linkedPackage.json[depType]
