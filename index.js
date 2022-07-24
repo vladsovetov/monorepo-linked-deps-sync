@@ -135,8 +135,12 @@ function findInconsistencies(packages) {
           )
         })
         if (foundVersionInconsistency) {
+          const newVersion = foundVersionInconsistency[1].replace(
+            /[\d.]+/,
+            masterPackage.json.version
+          )
           console.log(
-            `Found inconsistency in ${linkedPackage.path}: ${masterPackage.json.name} ${foundVersionInconsistency[1]} -> ${masterPackage.json.version}`
+            `Found inconsistency in ${linkedPackage.path}: ${masterPackage.json.name} ${foundVersionInconsistency[1]} -> ${newVersion}`
           )
           inconsistentPackages.push({
             ...linkedPackage,
@@ -144,10 +148,7 @@ function findInconsistencies(packages) {
               {
                 name: masterPackage.json.name,
                 oldVersion: foundVersionInconsistency[1],
-                newVersion: foundVersionInconsistency[1].replace(
-                  /[\d.]+/,
-                  masterPackage.json.version
-                )
+                newVersion
               }
             ]
           })
@@ -171,7 +172,7 @@ function fixInconsistencies(inconsistentPackages) {
         new RegExp(
           `("${reason.name}"\\s*:\\s*)"${maskVersionRegExp(reason.oldVersion)}"`
         ),
-        `$1"${maskVersionRegExp(reason.newVersion)}"`
+        `$1"${reason.newVersion}"`
       )
     }
     try {
