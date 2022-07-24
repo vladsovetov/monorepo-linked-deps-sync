@@ -9,4 +9,4 @@ And then commit following [commit convention](https://www.conventionalcommits.or
 When we have some commits and want to release a new version we should to perform next actions:
 2. commit the change following [commit convention](https://www.conventionalcommits.org/en/v1.0.0/)
 3. run `yarn release-tag` - to build new tag
-4. run `sync-tag` - to sync just created new tag
+4. run `yarn sync-tag` - to sync just created new tag
