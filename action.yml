@@ -12,11 +12,11 @@ inputs:
   sync-commit-email:
     description: "Commit message author's email"
     required: false
-    default: 'bot@monorepo-linked-deps-sync.io'
+    default: 'github-actions[bot]@users.noreply.github.com'
   sync-commit-name:
     description: "Commit message author's name"
     required: false
-    default: 'Bot Monorepo Linked Deps Sync'
+    default: 'github-actions[bot]'
 runs:
   using: 'node16'
   main: 'dist/index.js'
