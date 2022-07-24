@@ -122,14 +122,16 @@ function findInconsistencies(packages) {
       if (masterPackage.path === linkedPackage.path) continue
 
       for (const depType of ['dependencies', 'devDependencies']) {
-        if (!linkedPackage.json[depType]) continue
+        if (linkedPackage.json[depType]) continue
 
         const foundVersionInconsistency = Object.entries(
           linkedPackage.json[depType]
         ).find(([name, version]) => {
+          if (typeof version !== 'string') return false
+
           return (
             name === masterPackage.json.name &&
-            version !== masterPackage.json.version
+            !version.includes(masterPackage.json.version)
           )
         })
         if (foundVersionInconsistency) {
@@ -142,7 +144,10 @@ function findInconsistencies(packages) {
               {
                 name: masterPackage.json.name,
                 oldVersion: foundVersionInconsistency[1],
-                newVersion: masterPackage.json.version
+                newVersion: foundVersionInconsistency[1].replace(
+                  /[\d.]+/,
+                  masterPackage.json.version
+                )
               }
             ]
           })
