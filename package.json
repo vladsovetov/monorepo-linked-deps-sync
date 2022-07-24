@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "npx @vercel/ncc build index.js --license licenses.txt",
-    "release-tag": "export VERSION=$(echo \"console.log(require('./package.json').version);\" | node) && git tag -a -m 'Action release v'$VERSION ",
+    "release-tag": "export VERSION=$(echo \"console.log(require('./package.json').version);\" | node) && git tag -a -m 'Action release' v$VERSION",
     "sync-tag": "git push --follow-tags"
   },
   "repository": {
