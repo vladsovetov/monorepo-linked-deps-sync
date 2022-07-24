@@ -4,7 +4,7 @@
   "description": "Linking internal dependencies inside monorepo npm project",
   "main": "index.js",
   "scripts": {
-    "build": "ncc build index.js --license licenses.txt",
+    "build": "npx @vercel/ncc build index.js --license licenses.txt",
     "release-tag": "git tag -a -m 'Action release'",
     "sync-tag": "git push --follow-tags"
   },
